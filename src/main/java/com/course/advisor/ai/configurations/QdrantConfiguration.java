@@ -6,10 +6,11 @@ import io.qdrant.client.QdrantGrpcClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 
 @Configuration
 public class QdrantConfiguration {
+    private static final String UDEMY_CURSES = "udemy_curses";
+
     @Value("${qgrant.api-key}")
     private String qgrantApiKey;
     @Value("${qgrant.grpc-host}")
@@ -25,12 +26,13 @@ public class QdrantConfiguration {
     }
 
     @Bean
-    @Scope("prototype")
-    public QdrantEmbeddingStore.Builder qdrantEmbeddingStoreBuilder() {
+    public QdrantEmbeddingStore qdrantEmbeddingStoreBuilder() {
         return QdrantEmbeddingStore.builder()
                 .host(qgrantGrpcHost)
                 .port(6334)
                 .apiKey(qgrantApiKey)
-                .useTls(true);
+                .collectionName(UDEMY_CURSES)
+                .useTls(true)
+                .build();
     }
 }
