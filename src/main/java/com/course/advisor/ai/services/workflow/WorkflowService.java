@@ -23,7 +23,7 @@ public class WorkflowService {
         this.factory = factory;
     }
 
-    public String generateScript(String requirements) {
+    public String generateResult(String requirements) {
         var resultFuture = new CompletableFuture<String>();
         var stateMachine = factory.getStateMachine();
         addStateListener(stateMachine, resultFuture);

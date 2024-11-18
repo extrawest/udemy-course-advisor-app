@@ -1,7 +1,10 @@
-package com.course.advisor.ai.services.workflow;
+package com.course.advisor.ai.configurations;
 
 import com.course.advisor.ai.services.agents.CVExtractionAgent;
 import com.course.advisor.ai.services.agents.CurseRecommendationAgent;
+import com.course.advisor.ai.services.workflow.Events;
+import com.course.advisor.ai.services.workflow.States;
+import com.course.advisor.ai.services.workflow.Variables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +17,8 @@ import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
 import reactor.core.publisher.Mono;
+
+import java.util.Objects;
 
 @Configuration
 @EnableStateMachineFactory
@@ -44,21 +49,23 @@ class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
     public void configure(StateMachineTransitionConfigurer<States, Events> transitions) throws Exception {
         transitions
                 .withExternal().source(States.AWAITING_INPUT).target(States.CS_DATA_EXTRACTION).event(Events.INPUT_RECEIVED).and()
-                .withExternal().source(States.CS_DATA_EXTRACTION).target(States.RESULT_GENERATION).event(Events.REQUIREMENTS_EVALUATED).and()
-                .withExternal().source(States.CS_DATA_EXTRACTION).target(States.FAILED_COMPLETION).event(Events.REQUIREMENTS_REJECTED).and()
-                .withExternal().source(States.RESULT_GENERATION).target(States.SOLUTION_VERIFICATION).event(Events.SOLUTION_VERIFIED).and()
-                .withExternal().source(States.SOLUTION_VERIFICATION).target(States.SUCCESSFUL_COMPLETION).event(Events.SOLUTION_VERIFIED).and()
-                .withExternal().source(States.SOLUTION_VERIFICATION).target(States.RESULT_GENERATION).event(Events.SOLUTION_REJECTED);
+                .withExternal().source(States.CS_DATA_EXTRACTION).target(States.RESULT_GENERATION).event(Events.COURSE_FOUND).and()
+                .withExternal().source(States.CS_DATA_EXTRACTION).target(States.FAILED_COMPLETION).event(Events.COURSE_NOT_FOUND).and()
+                .withExternal().source(States.RESULT_GENERATION).target(States.SOLUTION_VERIFICATION).event(Events.RESULT_VERIFIED).and()
+                .withExternal().source(States.SOLUTION_VERIFICATION).target(States.SUCCESSFUL_COMPLETION).event(Events.RESULT_VERIFIED).and()
+                .withExternal().source(States.SOLUTION_VERIFICATION).target(States.RESULT_GENERATION).event(Events.RESULT_REJECTED);
     }
 
     private Action<States, Events> extractCvData() {
         return stateContext -> {
             log.info("Evaluating requirements...");
             var requirements = getVariable(stateContext, Variables.CV_DATA);
-            if (cvExtractionAgent.answer(requirements)) {
-                sendEvent(stateContext.getStateMachine(), Events.REQUIREMENTS_EVALUATED);
+            String cvData = cvExtractionAgent.answer(requirements);
+            if (Objects.nonNull(cvData)) {
+                stateContext.getExtendedState().getVariables().put(Variables.CV_DATA, cvData);
+                sendEvent(stateContext.getStateMachine(), Events.COURSE_FOUND);
             } else {
-                sendEvent(stateContext.getStateMachine(), Events.REQUIREMENTS_REJECTED);
+                sendEvent(stateContext.getStateMachine(), Events.COURSE_NOT_FOUND);
             }
         };
     }
@@ -66,10 +73,15 @@ class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
     private Action<States, Events> generateResult() {
         return stateContext -> {
             log.info("Generating script...");
-            var requirements = getVariable(stateContext, Variables.CV_DATA);
-            var script = curseRecommendationAgent.answer(requirements);
-            stateContext.getExtendedState().getVariables().put(Variables.RESULT, script);
-            sendEvent(stateContext.getStateMachine(), Events.SCRIPT_GENERATED);
+            var cvData = getVariable(stateContext, Variables.CV_DATA);
+            var result = curseRecommendationAgent.answer(cvData);
+
+            if (Objects.nonNull(result)) {
+                stateContext.getExtendedState().getVariables().put(Variables.RESULT, result);
+                sendEvent(stateContext.getStateMachine(), Events.RESULT_VERIFIED);
+            } else {
+                sendEvent(stateContext.getStateMachine(), Events.RESULT_REJECTED);
+            }
         };
     }
 

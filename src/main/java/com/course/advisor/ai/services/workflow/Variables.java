@@ -1,6 +1,6 @@
 package com.course.advisor.ai.services.workflow;
 
-class Variables {
+public class Variables {
 
     public static final String CV_DATA = "cvData";
     public static final String RESULT = "result";

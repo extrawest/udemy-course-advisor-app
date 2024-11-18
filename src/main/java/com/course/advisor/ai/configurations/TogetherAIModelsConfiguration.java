@@ -1,5 +1,7 @@
 package com.course.advisor.ai.configurations;
 
+import com.course.advisor.ai.services.agents.CVExtractionAgent;
+import com.course.advisor.ai.services.agents.CurseRecommendationAgent;
 import com.course.advisor.ai.utils.PromptUtil;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
@@ -9,6 +11,7 @@ import dev.langchain4j.rag.content.injector.DefaultContentInjector;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.qdrant.QdrantEmbeddingStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +29,17 @@ public class TogetherAIModelsConfiguration {
     private String modelName;
     @Value("${ai.embedding-model-name}")
     private String embeddingModelName;
+
+
+    @Bean
+    public CurseRecommendationAgent curseRecommendationAgent() {
+        return cvDataSummarized -> "Here is your course";
+    }
+
+    @Bean
+    public CVExtractionAgent cvExtractionAgent() {
+        return cvDataSummarized -> "Here is cv data";
+    }
 
     @Bean
     public OpenAiChatModel openAiChatModel() {
@@ -55,7 +69,7 @@ public class TogetherAIModelsConfiguration {
                 .build();
     }
 
-    @Bean
+    @Bean(name = "embeddingStoreContentRetriever")
     public ContentRetriever contentRetriever(OpenAiEmbeddingModel openAiEmbeddingModel, QdrantEmbeddingStore qdrantEmbeddingStore) {
         return EmbeddingStoreContentRetriever.builder()
                 .embeddingStore(qdrantEmbeddingStore)
@@ -66,7 +80,7 @@ public class TogetherAIModelsConfiguration {
     }
 
     @Bean
-    public RetrievalAugmentor retrievalAugmentor(ContentRetriever contentRetriever) throws IOException {
+    public RetrievalAugmentor retrievalAugmentor(@Qualifier("embeddingStoreContentRetriever") ContentRetriever contentRetriever) throws IOException {
         DefaultContentInjector contentInjector = DefaultContentInjector.builder()
                 .promptTemplate(PromptUtil.loadPromptTemplate(this.getClass(), "system_prompt.txt"))
                 .build();

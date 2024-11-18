@@ -1,6 +1,6 @@
 package com.course.advisor.ai.services.workflow;
 
-enum States {
+public enum States {
     AWAITING_INPUT,
     CS_DATA_EXTRACTION,
     RESULT_GENERATION,

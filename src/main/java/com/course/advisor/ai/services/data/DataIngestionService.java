@@ -1,4 +1,4 @@
-package com.course.advisor.ai.services.chat;
+package com.course.advisor.ai.services.data;
 
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
