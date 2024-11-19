@@ -58,7 +58,7 @@ class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
 
     private Action<States, Events> extractCvData() {
         return stateContext -> {
-            log.info("Evaluating requirements...");
+            log.info("Extracting CV data...");
             var requirements = getVariable(stateContext, Variables.CV_DATA);
             String cvData = cvExtractionAgent.answer(requirements);
             if (Objects.nonNull(cvData)) {
@@ -72,7 +72,7 @@ class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
 
     private Action<States, Events> generateResult() {
         return stateContext -> {
-            log.info("Generating script...");
+            log.info("Generating result...");
             var cvData = getVariable(stateContext, Variables.CV_DATA);
             var result = curseRecommendationAgent.answer(cvData);
 

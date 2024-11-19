@@ -38,7 +38,7 @@ public class WorkflowService {
 
             return resultFuture.get(30, TimeUnit.SECONDS);
         } catch (Exception e) {
-            log.error("State machine execution failed: " + e.getMessage());
+            log.error("State machine execution failed", e);
             throw new IllegalStateException(e);
         } finally {
             stateMachine.stopReactively().block();
@@ -55,8 +55,8 @@ public class WorkflowService {
                         if (resultObj != null) {
                             resultFuture.complete(resultObj.toString());
                         } else {
-                            log.error("Script not found at successful completion");
-                            resultFuture.completeExceptionally(new IllegalStateException("Script not found at successful completion state"));
+                            log.error("Result not found at successful completion");
+                            resultFuture.completeExceptionally(new IllegalStateException("Result not found at successful completion state"));
                         }
                     } else if (to.getId() == States.FAILED_COMPLETION) {
                         log.warn("Workflow ended due to invalid requirements.");
@@ -67,7 +67,7 @@ public class WorkflowService {
 
             @Override
             public void stateMachineError(StateMachine<States, Events> stateMachine, Exception exception) {
-                log.error("State machine encountered an error: " + exception.getMessage());
+                log.error("State machine encountered an error", exception);
                 resultFuture.completeExceptionally(exception);
             }
         });
