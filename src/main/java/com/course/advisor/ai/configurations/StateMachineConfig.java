@@ -1,7 +1,7 @@
 package com.course.advisor.ai.configurations;
 
 import com.course.advisor.ai.services.agents.CVExtractionAgent;
-import com.course.advisor.ai.services.agents.CurseRecommendationAgent;
+import com.course.advisor.ai.services.agents.CourseRecommendationAgent;
 import com.course.advisor.ai.services.workflow.Events;
 import com.course.advisor.ai.services.workflow.States;
 import com.course.advisor.ai.services.workflow.Variables;
@@ -26,11 +26,11 @@ class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
 
     private static final Logger log = LoggerFactory.getLogger(StateMachineConfig.class);
 
-    private final CurseRecommendationAgent curseRecommendationAgent;
+    private final CourseRecommendationAgent courseRecommendationAgent;
     private final CVExtractionAgent cvExtractionAgent;
 
-    StateMachineConfig(CurseRecommendationAgent curseRecommendationAgent, CVExtractionAgent cvExtractionAgent) {
-        this.curseRecommendationAgent = curseRecommendationAgent;
+    StateMachineConfig(CourseRecommendationAgent courseRecommendationAgent, CVExtractionAgent cvExtractionAgent) {
+        this.courseRecommendationAgent = courseRecommendationAgent;
         this.cvExtractionAgent = cvExtractionAgent;
     }
 
@@ -74,7 +74,7 @@ class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
         return stateContext -> {
             log.info("Generating result...");
             var cvData = getVariable(stateContext, Variables.CV_DATA);
-            var result = curseRecommendationAgent.answer(cvData);
+            var result = courseRecommendationAgent.answer(cvData);
 
             if (Objects.nonNull(result)) {
                 stateContext.getExtendedState().getVariables().put(Variables.RESULT, result);

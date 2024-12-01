@@ -8,9 +8,9 @@ import static dev.langchain4j.service.spring.AiServiceWiringMode.EXPLICIT;
         wiringMode = EXPLICIT,
         chatModel = "openAiChatModel",
         chatMemory = "chatMemory",
-        retrievalAugmentor = "retrievalAugmentor"
+        retrievalAugmentor = "recommendationRetrievalAugmentor"
 )
-public interface CurseRecommendationAgent {
+public interface CourseRecommendationAgent {
 
     String answer(String cvDataSummarized);
 

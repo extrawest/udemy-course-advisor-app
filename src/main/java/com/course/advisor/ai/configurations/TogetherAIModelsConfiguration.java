@@ -64,7 +64,7 @@ public class TogetherAIModelsConfiguration {
     }
 
     @Bean(name = "embeddingStoreContentRetriever")
-    public ContentRetriever contentRetriever(OpenAiEmbeddingModel openAiEmbeddingModel, QdrantEmbeddingStore qdrantEmbeddingStore) {
+    public ContentRetriever embeddingStoreContentRetriever(OpenAiEmbeddingModel openAiEmbeddingModel, QdrantEmbeddingStore qdrantEmbeddingStore) {
         return EmbeddingStoreContentRetriever.builder()
                 .embeddingStore(qdrantEmbeddingStore)
                 .embeddingModel(openAiEmbeddingModel)
@@ -73,15 +73,27 @@ public class TogetherAIModelsConfiguration {
                 .build();
     }
 
-    @Bean
-    public RetrievalAugmentor retrievalAugmentor(@Qualifier("embeddingStoreContentRetriever") ContentRetriever contentRetriever) throws IOException {
+    @Bean(name = "recommendationRetrievalAugmentor")
+    public RetrievalAugmentor recommendationRetrievalAugmentor(@Qualifier("embeddingStoreContentRetriever") ContentRetriever contentRetriever) throws IOException {
         DefaultContentInjector contentInjector = DefaultContentInjector.builder()
-                .promptTemplate(PromptUtil.loadPromptTemplate(this.getClass(), "system_prompt.txt"))
+                .promptTemplate(PromptUtil.loadPromptTemplate(this.getClass(), "recommendation_system_prompt.txt"))
                 .build();
 
         return DefaultRetrievalAugmentor.builder()
                 .contentRetriever(contentRetriever)
                 .contentInjector(contentInjector)
+                .build();
+    }
+
+    @Bean(name = "extractorRetrievalAugmentor")
+    public RetrievalAugmentor extractorRetrievalAugmentor(ContentRetriever contentRetriever) throws IOException {
+        DefaultContentInjector contentInjector = DefaultContentInjector.builder()
+                .promptTemplate(PromptUtil.loadPromptTemplate(this.getClass(), "extractor_system_prompt.txt"))
+                .build();
+
+        return DefaultRetrievalAugmentor.builder()
+                .contentInjector(contentInjector)
+                .contentRetriever(contentRetriever)
                 .build();
     }
 }
