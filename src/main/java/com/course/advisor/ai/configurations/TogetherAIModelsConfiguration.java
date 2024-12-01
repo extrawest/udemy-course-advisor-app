@@ -1,8 +1,8 @@
 package com.course.advisor.ai.configurations;
 
-import com.course.advisor.ai.services.agents.CVExtractionAgent;
-import com.course.advisor.ai.services.agents.CurseRecommendationAgent;
 import com.course.advisor.ai.utils.PromptUtil;
+import dev.langchain4j.memory.ChatMemory;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
 import dev.langchain4j.rag.DefaultRetrievalAugmentor;
@@ -30,17 +30,6 @@ public class TogetherAIModelsConfiguration {
     @Value("${ai.embedding-model-name}")
     private String embeddingModelName;
 
-
-    @Bean
-    public CurseRecommendationAgent curseRecommendationAgent() {
-        return cvDataSummarized -> "Here is your course";
-    }
-
-    @Bean
-    public CVExtractionAgent cvExtractionAgent() {
-        return cvDataSummarized -> "Here is cv data";
-    }
-
     @Bean
     public OpenAiChatModel openAiChatModel() {
         return OpenAiChatModel.builder()
@@ -55,6 +44,11 @@ public class TogetherAIModelsConfiguration {
                 .maxTokens(2000)
                 .build();
 
+    }
+
+    @Bean
+    public ChatMemory chatMemory() {
+        return MessageWindowChatMemory.withMaxMessages(10);
     }
 
     @Bean
