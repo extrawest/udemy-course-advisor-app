@@ -33,13 +33,14 @@ public class WorkflowService {
                     .doOnError(resultFuture::completeExceptionally)
                     .subscribe();
 
-            stateMachine.getExtendedState().getVariables().put(Variables.CV_DATA, requirements);
+            stateMachine.getExtendedState().getVariables().put(Variables.INPUT, requirements);
             stateMachine.sendEvent(Mono.just(MessageBuilder.withPayload(Events.INPUT_RECEIVED).build())).subscribe();
 
             return resultFuture.get(30, TimeUnit.SECONDS);
         } catch (Exception e) {
             log.error("State machine execution failed", e);
-            throw new IllegalStateException(e);
+            Thread.currentThread().interrupt();
+            return e.getMessage();
         } finally {
             stateMachine.stopReactively().block();
         }

@@ -51,16 +51,16 @@ class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
                 .withExternal().source(States.AWAITING_INPUT).target(States.CS_DATA_EXTRACTION).event(Events.INPUT_RECEIVED).and()
                 .withExternal().source(States.CS_DATA_EXTRACTION).target(States.RESULT_GENERATION).event(Events.COURSE_FOUND).and()
                 .withExternal().source(States.CS_DATA_EXTRACTION).target(States.FAILED_COMPLETION).event(Events.COURSE_NOT_FOUND).and()
-                .withExternal().source(States.RESULT_GENERATION).target(States.SOLUTION_VERIFICATION).event(Events.RESULT_VERIFIED).and()
-                .withExternal().source(States.SOLUTION_VERIFICATION).target(States.SUCCESSFUL_COMPLETION).event(Events.RESULT_VERIFIED).and()
-                .withExternal().source(States.SOLUTION_VERIFICATION).target(States.RESULT_GENERATION).event(Events.RESULT_REJECTED);
+                .withExternal().source(States.RESULT_GENERATION).target(States.SUCCESSFUL_COMPLETION).event(Events.RESULT_VERIFIED).and()
+                .withExternal().source(States.RESULT_GENERATION).target(States.FAILED_COMPLETION).event(Events.RESULT_REJECTED);
     }
 
     private Action<States, Events> extractCvData() {
         return stateContext -> {
             log.info("Extracting CV data...");
-            var requirements = getVariable(stateContext, Variables.CV_DATA);
+            var requirements = getVariable(stateContext, Variables.INPUT);
             String cvData = cvExtractionAgent.answer(requirements);
+
             if (Objects.nonNull(cvData)) {
                 stateContext.getExtendedState().getVariables().put(Variables.CV_DATA, cvData);
                 sendEvent(stateContext.getStateMachine(), Events.COURSE_FOUND);
