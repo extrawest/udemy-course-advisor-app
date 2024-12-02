@@ -1,7 +1,6 @@
 package com.course.advisor.ai.services.workflow;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineFactory;
@@ -10,20 +9,20 @@ import org.springframework.statemachine.state.State;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 public class WorkflowService {
-
-    private static final Logger log = LoggerFactory.getLogger(WorkflowService.class);
     private final StateMachineFactory<States, Events> factory;
 
     WorkflowService(StateMachineFactory<States, Events> factory) {
         this.factory = factory;
     }
 
-    public String generateResult(String requirements) {
+    public String generateResult(String cvData, String requirements) {
         var resultFuture = new CompletableFuture<String>();
         var stateMachine = factory.getStateMachine();
         addStateListener(stateMachine, resultFuture);
@@ -33,10 +32,13 @@ public class WorkflowService {
                     .doOnError(resultFuture::completeExceptionally)
                     .subscribe();
 
-            stateMachine.getExtendedState().getVariables().put(Variables.INPUT, requirements);
+            stateMachine.getExtendedState().getVariables().put(Variables.INPUT, cvData);
+            if (Objects.nonNull(requirements)) {
+                stateMachine.getExtendedState().getVariables().put(Variables.REQUIREMENTS, requirements);
+            }
             stateMachine.sendEvent(Mono.just(MessageBuilder.withPayload(Events.INPUT_RECEIVED).build())).subscribe();
 
-            return resultFuture.get(30, TimeUnit.SECONDS);
+            return resultFuture.get(1, TimeUnit.MINUTES);
         } catch (Exception e) {
             log.error("State machine execution failed", e);
             Thread.currentThread().interrupt();

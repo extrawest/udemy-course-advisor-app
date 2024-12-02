@@ -5,8 +5,7 @@ import com.course.advisor.ai.services.agents.CourseRecommendationAgent;
 import com.course.advisor.ai.services.workflow.Events;
 import com.course.advisor.ai.services.workflow.States;
 import com.course.advisor.ai.services.workflow.Variables;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateContext;
@@ -22,10 +21,8 @@ import java.util.Objects;
 
 @Configuration
 @EnableStateMachineFactory
+@Slf4j
 class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
-
-    private static final Logger log = LoggerFactory.getLogger(StateMachineConfig.class);
-
     private final CourseRecommendationAgent courseRecommendationAgent;
     private final CVExtractionAgent cvExtractionAgent;
 
@@ -58,11 +55,12 @@ class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
     private Action<States, Events> extractCvData() {
         return stateContext -> {
             log.info("Extracting CV data...");
-            var requirements = getVariable(stateContext, Variables.INPUT);
-            String cvData = cvExtractionAgent.answer(requirements);
+            var input = getVariable(stateContext, Variables.INPUT);
+            String cvDataSummarized = cvExtractionAgent.answer(input);
 
-            if (Objects.nonNull(cvData)) {
-                stateContext.getExtendedState().getVariables().put(Variables.CV_DATA, cvData);
+            if (Objects.nonNull(cvDataSummarized)) {
+                log.info("CV data summarized {}", cvDataSummarized);
+                stateContext.getExtendedState().getVariables().put(Variables.CV_DATA, cvDataSummarized);
                 sendEvent(stateContext.getStateMachine(), Events.COURSE_FOUND);
             } else {
                 sendEvent(stateContext.getStateMachine(), Events.COURSE_NOT_FOUND);
@@ -73,8 +71,16 @@ class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
     private Action<States, Events> generateResult() {
         return stateContext -> {
             log.info("Generating result...");
-            var cvData = getVariable(stateContext, Variables.CV_DATA);
-            var result = courseRecommendationAgent.answer(cvData);
+            var cvDataSummarized = getVariable(stateContext, Variables.CV_DATA);
+            var requirements = getVariable(stateContext, Variables.REQUIREMENTS);
+
+            String question = cvDataSummarized;
+            if (Objects.nonNull(requirements)) {
+                question = question + ", details: " + requirements;
+            }
+
+            log.info("Question {}", question);
+            var result = courseRecommendationAgent.answer(question);
 
             if (Objects.nonNull(result)) {
                 stateContext.getExtendedState().getVariables().put(Variables.RESULT, result);
@@ -86,7 +92,12 @@ class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
     }
 
     private String getVariable(StateContext<States, Events> stateContext, String key) {
-        return stateContext.getExtendedState().getVariables().get(key).toString();
+        Object variable = stateContext.getExtendedState().getVariables().get(key);
+        if (Objects.nonNull(variable)) {
+            return variable.toString();
+        } else {
+            return null;
+        }
     }
 
     private void sendEvent(StateMachine<States, Events> stateMachine, Events event) {

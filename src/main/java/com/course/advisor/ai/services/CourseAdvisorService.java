@@ -20,9 +20,9 @@ public class CourseAdvisorService {
     private final WorkflowService workflowService;
     private final DataIngestionService dataIngestionService;
 
-    public String findCourses(MultipartFile file) {
+    public String findCourses(MultipartFile file, String requirements) {
         try {
-            return workflowService.generateResult(Base64.getEncoder().encodeToString(file.getBytes()));
+            return workflowService.generateResult(Base64.getEncoder().encodeToString(file.getBytes()), requirements);
         } catch (Exception e) {
             log.error(e.getMessage());
             return e.getMessage();
