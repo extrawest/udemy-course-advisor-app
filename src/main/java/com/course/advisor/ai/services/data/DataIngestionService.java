@@ -1,5 +1,6 @@
 package com.course.advisor.ai.services.data;
 
+import com.course.advisor.ai.configurations.QdrantConfiguration;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
 import dev.langchain4j.data.document.Metadata;
@@ -23,8 +24,6 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 @Service
 public class DataIngestionService {
-    private static final String CURSES = "curses";
-
     private final OpenAiEmbeddingModel openAiEmbeddingModel;
     private final QdrantEmbeddingStore qdrantEmbeddingStore;
     private final QdrantClient qdrantClient;
@@ -32,7 +31,7 @@ public class DataIngestionService {
     public void createCollection() {
         try {
             qdrantClient.createCollectionAsync(
-                    CURSES,
+                    QdrantConfiguration.UDEMY_CURSES,
                     VectorParams.newBuilder().setDistance(Distance.Dot).setSize(768).build()
             ).get();
         } catch (InterruptedException | ExecutionException e) {

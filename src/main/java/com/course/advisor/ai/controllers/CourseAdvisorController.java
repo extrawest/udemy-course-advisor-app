@@ -1,5 +1,6 @@
 package com.course.advisor.ai.controllers;
 
+import com.course.advisor.ai.models.CourseAdviseResponse;
 import com.course.advisor.ai.services.CourseAdvisorService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +22,19 @@ public class CourseAdvisorController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<String> findCourses(@RequestPart MultipartFile file) {
+    public ResponseEntity<CourseAdviseResponse> findCourses(@RequestPart MultipartFile file) {
         String result = service.findCourses(file);
-        return ResponseEntity.ok().body(result);
+        return ResponseEntity.ok().body(new CourseAdviseResponse(result));
+    }
+
+    @Operation(summary = "Ready to use")
+    @PostMapping(
+            path = "/initDB",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<CourseAdviseResponse> initDB(@RequestPart MultipartFile file) {
+        service.initDB(file);
+        return ResponseEntity.ok().body(new CourseAdviseResponse("Check logs"));
     }
 }

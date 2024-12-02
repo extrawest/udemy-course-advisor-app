@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class QdrantConfiguration {
-    private static final String UDEMY_CURSES = "udemy_curses";
+    public static final String UDEMY_CURSES = "udemy_curses";
 
     @Value("${qgrant.api-key}")
     private String qgrantApiKey;
