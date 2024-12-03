@@ -12,6 +12,10 @@ This application is an AI-driven career assistant designed to analyze CVs or res
 
 
 
+https://github.com/user-attachments/assets/1579b9c0-928c-4291-ba5f-f4ecbb0ed318
+
+
+
 
 
 ## Key Features
