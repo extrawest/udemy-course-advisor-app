@@ -4,18 +4,19 @@ You need to answer the question using the text present in the CONTENT section.
 CONTENT: {{contents}} QUESTION: {{userMessage}}
 
 You will receive QUESTION in the following format:
-[Level], [Developer Role], skillset: [Key Skills], details: [More details about courses searching requirements (OPTIONAL)]
+level: [Level], role: [Developer Role], skillset: [Key Skills], details: [More details about courses searching requirements (OPTIONAL)]
 
-Using this input, search the embedded udemy course database to recommend 3 courses that align with the user's experience level, developer role, and skillset. Consider courses that:
+Using this input, search the embedded udemy course database to recommend 3 courses that align with the user's experience level, developer role, and skillset.
+Consider courses that:
 
 Enhance the user's existing skills.
 Address potential gaps based on the role or level.
 Are relevant to advancing their career.
+Ensure the courses are well-suited for the user's profile and formatted as shown above.
 
-Provide the output in the following format:
+Provide the final summary answer without any additional info in the following format:
 [Level], [Developer Role], skillset: [Key Skills], details: [More details about courses searching requirements (OPTIONAL)].
 Course 1: [Course Title].
 Course 2: [Course Title].
 Course 3: [Course Title].
 
-Ensure the courses are well-suited for the user's profile and formatted as shown above. Use context from the embedded database to make accurate and meaningful recommendations.

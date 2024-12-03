@@ -1,6 +1,7 @@
 package com.course.advisor.ai.configurations;
 
-import com.course.advisor.ai.services.agents.CVExtractionAgent;
+import com.course.advisor.ai.services.agents.DocumentExtractorAgent;
+import com.course.advisor.ai.services.agents.ImageExtractorAgent;
 import com.course.advisor.ai.services.agents.CourseRecommendationAgent;
 import com.course.advisor.ai.services.workflow.Events;
 import com.course.advisor.ai.services.workflow.States;
@@ -24,11 +25,17 @@ import java.util.Objects;
 @Slf4j
 class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
     private final CourseRecommendationAgent courseRecommendationAgent;
-    private final CVExtractionAgent cvExtractionAgent;
+    private final DocumentExtractorAgent documentExtractorAgent;
+    private final ImageExtractorAgent cvExtractionAgent;
 
-    StateMachineConfig(CourseRecommendationAgent courseRecommendationAgent, CVExtractionAgent cvExtractionAgent) {
+    StateMachineConfig(
+            CourseRecommendationAgent courseRecommendationAgent,
+            ImageExtractorAgent cvExtractionAgent,
+            DocumentExtractorAgent documentExtractorAgent
+    ) {
         this.courseRecommendationAgent = courseRecommendationAgent;
         this.cvExtractionAgent = cvExtractionAgent;
+        this.documentExtractorAgent = documentExtractorAgent;
     }
 
     @Override
@@ -56,6 +63,8 @@ class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
         return stateContext -> {
             log.info("Extracting CV data...");
             var input = getVariable(stateContext, Variables.INPUT);
+
+            log.info("Input {}", input);
             String cvDataSummarized = cvExtractionAgent.answer(input);
 
             if (Objects.nonNull(cvDataSummarized)) {

@@ -1,6 +1,7 @@
 package com.course.advisor.ai.controllers;
 
 import com.course.advisor.ai.models.CourseAdviseResponse;
+import com.course.advisor.ai.models.CvFileType;
 import com.course.advisor.ai.services.CourseAdvisorService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +26,10 @@ public class CourseAdvisorController {
     )
     public ResponseEntity<CourseAdviseResponse> findCourses(
             @RequestPart MultipartFile file,
+            @RequestParam CvFileType cvFileType,
             @RequestParam(required = false) String requirements
     ) {
-        String result = service.findCourses(file, requirements);
+        String result = service.findCourses(file, cvFileType, requirements);
         return ResponseEntity.ok().body(new CourseAdviseResponse(result));
     }
 

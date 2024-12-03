@@ -88,7 +88,7 @@ public class TogetherAIModelsConfiguration {
     @Bean(name = "extractorRetrievalAugmentor")
     public RetrievalAugmentor extractorRetrievalAugmentor(ContentRetriever contentRetriever) throws IOException {
         DefaultContentInjector contentInjector = DefaultContentInjector.builder()
-                .promptTemplate(PromptUtil.loadPromptTemplate(this.getClass(), "extractor_system_prompt.txt"))
+                .promptTemplate(PromptUtil.loadPromptTemplate(this.getClass(), "document_extractor_system_prompt.txt"))
                 .build();
 
         return DefaultRetrievalAugmentor.builder()
