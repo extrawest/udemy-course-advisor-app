@@ -4,7 +4,7 @@ You need to answer the question using the text present in the CONTENT section.
 CONTENT: {{contents}} QUESTION: {{userMessage}}
 
 You will receive QUESTION in the following format:
-level: [Level], role: [Developer Role], skillset: [Key Skills], details: [More details about courses searching requirements (OPTIONAL)]
+level: [Level], role: [Developer Role], skillset: [Key Skills], details: [some additional requirements or without additional requirements]
 
 Using this input, search the embedded udemy course database to recommend 3 courses that align with the user's experience level, developer role, and skillset.
 Consider courses that:

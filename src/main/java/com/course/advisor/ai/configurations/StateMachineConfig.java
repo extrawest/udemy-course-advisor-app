@@ -1,5 +1,6 @@
 package com.course.advisor.ai.configurations;
 
+import com.course.advisor.ai.models.CvFileType;
 import com.course.advisor.ai.services.agents.DocumentExtractorAgent;
 import com.course.advisor.ai.services.agents.ImageExtractorAgent;
 import com.course.advisor.ai.services.agents.CourseRecommendationAgent;
@@ -26,15 +27,15 @@ import java.util.Objects;
 class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
     private final CourseRecommendationAgent courseRecommendationAgent;
     private final DocumentExtractorAgent documentExtractorAgent;
-    private final ImageExtractorAgent cvExtractionAgent;
+    private final ImageExtractorAgent imageExtractorAgent;
 
     StateMachineConfig(
             CourseRecommendationAgent courseRecommendationAgent,
-            ImageExtractorAgent cvExtractionAgent,
+            ImageExtractorAgent imageExtractorAgent,
             DocumentExtractorAgent documentExtractorAgent
     ) {
         this.courseRecommendationAgent = courseRecommendationAgent;
-        this.cvExtractionAgent = cvExtractionAgent;
+        this.imageExtractorAgent = imageExtractorAgent;
         this.documentExtractorAgent = documentExtractorAgent;
     }
 
@@ -62,14 +63,21 @@ class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
     private Action<States, Events> extractCvData() {
         return stateContext -> {
             log.info("Extracting CV data...");
+            var cvFileType = CvFileType.valueOf(getVariable(stateContext, Variables.CV_FILE_TYPE));
             var input = getVariable(stateContext, Variables.INPUT);
 
             log.info("Input {}", input);
-            String cvDataSummarized = cvExtractionAgent.answer(input);
 
-            if (Objects.nonNull(cvDataSummarized)) {
-                log.info("CV data summarized {}", cvDataSummarized);
-                stateContext.getExtendedState().getVariables().put(Variables.CV_DATA, cvDataSummarized);
+            String extractedSummary;
+            if (cvFileType.equals(CvFileType.PDF) || cvFileType.equals(CvFileType.DOCS)) {
+                extractedSummary = documentExtractorAgent.extractSummary(input);
+            } else {
+                extractedSummary = imageExtractorAgent.extractSummary(input);
+            }
+
+            if (Objects.nonNull(extractedSummary)) {
+                log.info("CV data summarized {}", extractedSummary);
+                stateContext.getExtendedState().getVariables().put(Variables.CV_DATA, extractedSummary);
                 sendEvent(stateContext.getStateMachine(), Events.COURSE_FOUND);
             } else {
                 sendEvent(stateContext.getStateMachine(), Events.COURSE_NOT_FOUND);
@@ -83,10 +91,7 @@ class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
             var cvDataSummarized = getVariable(stateContext, Variables.CV_DATA);
             var requirements = getVariable(stateContext, Variables.REQUIREMENTS);
 
-            String question = cvDataSummarized;
-            if (Objects.nonNull(requirements)) {
-                question = question + ", details: " + requirements;
-            }
+            String question = cvDataSummarized + requirements;
 
             log.info("Question {}", question);
             var result = courseRecommendationAgent.answer(question);

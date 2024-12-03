@@ -19,7 +19,7 @@ import java.util.HashMap;
 public class ImageExtractorAgent {
     private final OpenAiChatModel openAiChatModel;
 
-    private String extractSummary(String content) {
+    public String extractSummary(String content) {
         try {
             var systemPrompt = PromptUtil.loadPromptTemplate(this.getClass(), "image_extractor_system.prompt.txt").apply(new HashMap<>());
 
