@@ -20,6 +20,7 @@ import java.util.Date;
         )
 )
 public class SwaggerConfig {
+
     @Bean
     public GroupedOpenApi publicApi() {
         SpringDocUtils.getConfig().replaceWithClass(LocalDateTime.class, Long.class);

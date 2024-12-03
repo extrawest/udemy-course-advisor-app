@@ -4,7 +4,7 @@ You need to answer the question using the text present in the CONTENT section.
 CONTENT: {{contents}} QUESTION: {{userMessage}}
 
 You will receive QUESTION in the following format:
-level: [Level], role: [Developer Role], skillset: [Key Skills], details: [some additional requirements or without additional requirements]
+level: [Level], role: [Developer Role], skillset: [Key Skills], details: [some additional requirements or no additional requirements]
 
 Using this input, search the embedded udemy course database to recommend 3 courses that align with the user's experience level, developer role, and skillset.
 Consider courses that:
@@ -16,7 +16,7 @@ Ensure the courses are well-suited for the user's profile and formatted as shown
 
 Provide the final summary answer without any additional info in the following format:
 [Level], [Developer Role], skillset: [Key Skills], details: [More details about courses searching requirements (OPTIONAL)].
-Course 1: [Course Title].
-Course 2: [Course Title].
-Course 3: [Course Title].
+Course 1: [Course Title], [Course Url].
+Course 2: [Course Title], [Course Url].
+Course 3: [Course Title], [Course Url].
 

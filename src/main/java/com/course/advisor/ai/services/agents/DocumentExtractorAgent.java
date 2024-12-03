@@ -5,7 +5,7 @@ import dev.langchain4j.chain.ConversationalRetrievalChain;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
 import dev.langchain4j.rag.DefaultRetrievalAugmentor;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 public class DocumentExtractorAgent {
     private final OpenAiEmbeddingModel openAiEmbeddingModel;
     private final OpenAiChatModel openAiChatModel;
+    private final ChatMemory chatMemory;
 
     public String extractSummary(String content) {
         try {
@@ -52,7 +53,7 @@ public class DocumentExtractorAgent {
 
             ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
                     .chatLanguageModel(openAiChatModel)
-                    .chatMemory(MessageWindowChatMemory.withMaxMessages(10))
+                    .chatMemory(chatMemory)
                     .retrievalAugmentor(defaultRetrievalAugmentor)
                     .build();
 

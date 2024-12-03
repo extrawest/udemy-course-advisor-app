@@ -27,10 +27,12 @@ public class TogetherAIModelsConfiguration {
     private String baseUrl;
     @Value("${ai.model-name}")
     private String modelName;
+    @Value("${ai.chat-model-name}")
+    private String chatModelName;
     @Value("${ai.embedding-model-name}")
     private String embeddingModelName;
 
-    @Bean
+    @Bean(name = "openAiChatModel")
     public OpenAiChatModel openAiChatModel() {
         return OpenAiChatModel.builder()
                 .apiKey(apiKey)
@@ -43,7 +45,21 @@ public class TogetherAIModelsConfiguration {
                 .temperature(0.0)
                 .maxTokens(2000)
                 .build();
+    }
 
+    @Bean(name = "chatOpenAiChatModel")
+    public OpenAiChatModel chatOpenAiChatModel() {
+        return OpenAiChatModel.builder()
+                .apiKey(apiKey)
+                .baseUrl(baseUrl)
+                .modelName(chatModelName)
+                .timeout(Duration.ofMinutes(2))
+                .logRequests(true)
+                .logResponses(true)
+                .maxRetries(1)
+                .temperature(0.0)
+                .maxTokens(2000)
+                .build();
     }
 
     @Bean
@@ -73,8 +89,8 @@ public class TogetherAIModelsConfiguration {
                 .build();
     }
 
-    @Bean(name = "recommendationRetrievalAugmentor")
-    public RetrievalAugmentor recommendationRetrievalAugmentor(@Qualifier("embeddingStoreContentRetriever") ContentRetriever contentRetriever) throws IOException {
+    @Bean(name = "advisorRetrievalAugmentor")
+    public RetrievalAugmentor advisorRetrievalAugmentor(@Qualifier("embeddingStoreContentRetriever") ContentRetriever contentRetriever) throws IOException {
         DefaultContentInjector contentInjector = DefaultContentInjector.builder()
                 .promptTemplate(PromptUtil.loadPromptTemplate(this.getClass(), "recommendation_system_prompt.txt"))
                 .build();

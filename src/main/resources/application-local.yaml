@@ -20,6 +20,7 @@ ai:
   api-key: ${TOGETHER_AI_API_KEY}
   base-url: https://api.together.xyz/v1
   model-name: meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo
+  chat-model-name: meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo
   embedding-model-name: togethercomputer/m2-bert-80M-8k-retrieval
 
 #Pass API key as environment variable, e.g. -DQDRANT_API_KEY=your-api-key

@@ -3,7 +3,7 @@ package com.course.advisor.ai.configurations;
 import com.course.advisor.ai.models.CvFileType;
 import com.course.advisor.ai.services.agents.DocumentExtractorAgent;
 import com.course.advisor.ai.services.agents.ImageExtractorAgent;
-import com.course.advisor.ai.services.agents.CourseRecommendationAgent;
+import com.course.advisor.ai.services.agents.CourseAdvisorAgent;
 import com.course.advisor.ai.services.workflow.Events;
 import com.course.advisor.ai.services.workflow.States;
 import com.course.advisor.ai.services.workflow.Variables;
@@ -25,16 +25,16 @@ import java.util.Objects;
 @EnableStateMachineFactory
 @Slf4j
 class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
-    private final CourseRecommendationAgent courseRecommendationAgent;
+    private final CourseAdvisorAgent courseAdvisorAgent;
     private final DocumentExtractorAgent documentExtractorAgent;
     private final ImageExtractorAgent imageExtractorAgent;
 
     StateMachineConfig(
-            CourseRecommendationAgent courseRecommendationAgent,
+            CourseAdvisorAgent courseAdvisorAgent,
             ImageExtractorAgent imageExtractorAgent,
             DocumentExtractorAgent documentExtractorAgent
     ) {
-        this.courseRecommendationAgent = courseRecommendationAgent;
+        this.courseAdvisorAgent = courseAdvisorAgent;
         this.imageExtractorAgent = imageExtractorAgent;
         this.documentExtractorAgent = documentExtractorAgent;
     }
@@ -94,7 +94,7 @@ class StateMachineConfig extends StateMachineConfigurerAdapter<States, Events> {
             String question = cvDataSummarized + requirements;
 
             log.info("Question {}", question);
-            var result = courseRecommendationAgent.answer(question);
+            var result = courseAdvisorAgent.generateAdvice(question);
 
             if (Objects.nonNull(result)) {
                 stateContext.getExtendedState().getVariables().put(Variables.RESULT, result);
