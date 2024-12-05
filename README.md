@@ -1,4 +1,4 @@
-# SkillPath AI
+# Multi-Agent an AI-driven app focused on personalized learning, where users upload their CV/Resume to receive tailored Udemy course recommendations to advance their developer role
 
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)]()
 [![Maintainer](https://img.shields.io/static/v1?label=Yevhen%20Ruban&message=Maintainer&color=red)](mailto:yevhen.ruban@extrawest.com)
